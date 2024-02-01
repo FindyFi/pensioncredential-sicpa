@@ -1,0 +1,11 @@
+{
+    "client_id": "<Your SICPA API client id>",
+    "client_secret": "<Your SICPA API client secret>",
+    "credentials_api": "https://api.sandbox.dip.sicpa.com/credentials-api",
+    "token_url": "https://signin.sandbox.dip.sicpa.com/oauth2/token",
+    "ns_prefix": "https://findy.fi/credentials",
+    "db_file": "database.sqlite",
+    "server_host": "localhost",
+    "issuer_port": 7080,
+    "verifier_port": 7081
+}

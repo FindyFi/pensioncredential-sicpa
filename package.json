@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "express": "latest",
+    "qrcode": "^1.5.3",
+    "sqlite3": "latest"
+  }
+}

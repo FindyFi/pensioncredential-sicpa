@@ -1,9 +1,5 @@
 import { createServer } from 'node:http'
-import config from './config.json' assert {'type': 'json'}
-// import { auth_token } from './auth.js'
-// import {db, roles} from './init.js'
-
-// console.log(roles)
+import { config } from './init.js'
 
 const requestCredential = async function (req, res) {
   if (req.url !== '/') {

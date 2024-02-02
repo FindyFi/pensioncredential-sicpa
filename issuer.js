@@ -1,27 +1,13 @@
-import { createHash } from 'node:crypto'
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
-import config from './config.json' assert {'type': 'json'}
+import {config, jsonHeaders, roles} from './init.js'
 import credential from './pensioncredential.json' assert {'type': 'json'}
-import { auth_token } from './auth.js'
-import {db, roles} from './init.js'
-
-// console.log(roles)
-// console.log(JSON.stringify(credential, null, 2))
-
-/*
-const holder = {
-    did: "did:something:..."
-}
-*/
-const hash = createHash('sha256')
-const salt = config.ns_prefix
 
 const issueUrl = `${config.credentials_api}/openid4vc/credential_offer`
 const credParams = {
   method: 'POST',
   headers: {
-    'Authorization': auth_token,
+    'Authorization': jsonHeaders.Authorization,
     'Accept': '*/*',
     'Content-Type': 'application/json',
     'X-ORGANIZATION-ID': roles.issuer.id,

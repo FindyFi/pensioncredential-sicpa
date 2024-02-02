@@ -7,6 +7,13 @@ const issuerLogo = 'https://www.kela.fi/documents/20124/410402/logo-kela-rgb.png
 const verifierName = 'HSL'
 const verifierLogo = 'https://cdn-assets-cloud.frontify.com/s3/frontify-cloud-files-us/eyJwYXRoIjoiZnJvbnRpZnlcL2FjY291bnRzXC8yZFwvMTkyOTA4XC9wcm9qZWN0c1wvMjQ5NjY1XC9hc3NldHNcL2UzXC80NTY4ODQ2XC9lMjY2Zjg2NTU1Y2VjMGExZGM4ZmVkNDRiODdiMTNjNi0xNTk1NDI5MTAxLnN2ZyJ9:frontify:B-Us_1Aj3DJ5FKHvjZX1S0UOpg5wCFDIv4CNfy6rXQY?width=2400'
 
+// override config file with environment variables
+for (const param in config) {
+    if (process.env[param] !== undefined) {
+        config[param] = process.env[param]
+    }
+}
+
 const jsonHeaders = {
     'Authorization': auth_token,
     'Accept': 'application/json',
@@ -15,7 +22,7 @@ const jsonHeaders = {
 
 const db = await openDB()
 const roles = await initRoles()
-export {db, roles}
+export { config, db, jsonHeaders, roles }
 
 function openDB() {
     return new Promise((resolve, reject) => {

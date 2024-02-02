@@ -40,8 +40,13 @@ const credentialOffer = `openid-credential-offer://?credential_offer_uri=${encod
 console.log(credentialOffer)
 
 const sendOffer = async function (req, res) {
+  if (req.url !== '/') {
+    res.setHeader("Content-Type", "text/plain")
+    res.writeHead(404)
+    res.end(`Not Found`)
+    return false
+  }
   const dataURL = await QRCode.toDataURL(credentialOffer)
-
   res.setHeader("Content-Type", "text/html");
   res.writeHead(200);
   res.end(`<!DOCTYPE html>

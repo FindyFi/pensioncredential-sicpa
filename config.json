@@ -3,7 +3,7 @@
     "client_secret": "<Your SICPA API client secret>",
     "credentials_api": "https://api.sandbox.dip.sicpa.com/credentials-api",
     "token_url": "https://signin.sandbox.dip.sicpa.com/oauth2/token",
-    "ns_prefix": "https://findy.fi/credentials",
+    "ns_prefix": "https://pensiondemo.findy.fi",
     "db_file": "database.sqlite",
     "server_host": "localhost",
     "issuer_port": 7080,

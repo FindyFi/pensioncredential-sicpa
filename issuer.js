@@ -4,13 +4,14 @@ import {config, jsonHeaders, roles} from './init.js'
 import credential from './pensioncredential.json' assert {'type': 'json'}
 
 const issueUrl = `${config.credentials_api}/openid4vc/credential_offer`
+let apiHeaders = jsonHeaders
 
 async function createOffer() {
   credential.issuer = roles.issuer.did
   credential.issuanceDate = new Date().toISOString()
   const credParams = {
     method: 'POST',
-    headers: jsonHeaders,
+    headers: apiHeaders,
     body: JSON.stringify({
       "credential": credential,
       "issuerDid": roles.issuer.did,
@@ -31,7 +32,7 @@ async function createOffer() {
     // console.log(JSON.stringify(obj, null, 1))
     // refresh auth token
     const init = await import('./init.js')
-    jsonHeaders = init.jsonHeaders
+    apiHeaders = init.jsonHeaders
     return createOffer()
   }
   console.log(credentialOffer)

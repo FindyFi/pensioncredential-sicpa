@@ -26,9 +26,13 @@ async function createOffer() {
   // console.log(resp.status, offerUri)
   const credentialOffer = `openid-credential-offer://?credential_offer_uri=${encodeURIComponent(offerUri)}`
   if (!createOffer) {
-    console.warn('No credential offer!')
-    console.log(issueUrl, credParams)
-    console.log(JSON.stringify(obj, null, 1))
+    // console.warn('No credential offer!')
+    // console.log(issueUrl, credParams)
+    // console.log(JSON.stringify(obj, null, 1))
+    // refresh auth token
+    const init = await import('./init.js')
+    jsonHeaders = init.jsonHeaders
+    return createOffer()
   }
   console.log(credentialOffer)
   return credentialOffer  

@@ -6,7 +6,7 @@ import credential from './pensioncredential.json' assert {'type': 'json'}
 const issueUrl = `${config.credentials_api}/openid4vc/credential_offer`
 
 async function createOffer() {
-  credential.issuer = {did: roles.issuer.did}
+  credential.issuer = roles.issuer.did
   credential.issuanceDate = new Date().toISOString()
   const credParams = {
     method: 'POST',

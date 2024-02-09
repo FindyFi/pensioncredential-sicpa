@@ -27,7 +27,7 @@ async function createOffer() {
   }
   const obj = await resp.json()
   const offerUri = obj.credentialOfferUri
-  id (!offerUri) {
+  if (!offerUri) {
     console.warn(resp.status, JSON.stringify(obj, null, 1))
   }
   // console.log(resp.status, offerUri)

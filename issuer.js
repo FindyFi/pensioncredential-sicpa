@@ -4,14 +4,13 @@ import {config, jsonHeaders, roles} from './init.js'
 import credential from './pensioncredential.json' assert {'type': 'json'}
 
 const issueUrl = `${config.credentials_api}/openid4vc/credential_offer`
-let apiHeaders = jsonHeaders
 
 async function createOffer() {
   credential.issuer = roles.issuer.did
   credential.issuanceDate = new Date().toISOString()
   const credParams = {
     method: 'POST',
-    headers: apiHeaders,
+    headers: jsonHeaders,
     body: JSON.stringify({
       "credential": credential,
       "issuerDid": roles.issuer.did,
@@ -19,21 +18,16 @@ async function createOffer() {
   }
   credParams.headers.Accept = '*/*'
   credParams.headers['X-ORGANIZATION-ID'] = roles.issuer.id
-
   // console.log(issueUrl, credParams)
   const resp = await fetch(issueUrl, credParams)
+  if (resp.status == 403) {
+    // refresh auth token
+    jsonHeaders.Authorization = await import('./auth.js')
+    return createOffer() // recursion; possible infinite loop!
+  }
   const obj = await resp.json()
   const offerUri = obj.credentialOfferUri
   // console.log(resp.status, offerUri)
-  if (!offerUri) {
-    // console.warn('No credential offer!')
-    // console.log(issueUrl, credParams)
-    // console.log(JSON.stringify(obj, null, 1))
-    // refresh auth token
-    const init = await import('./init.js')
-    apiHeaders = init.jsonHeaders
-    return createOffer()
-  }
   const credentialOffer = `openid-credential-offer://?credential_offer_uri=${encodeURIComponent(offerUri)}`
   console.log(credentialOffer)
   return credentialOffer  

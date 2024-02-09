@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3'
 import config from './config.json' assert {'type': 'json'}
-import { auth_token } from './auth.js'
+import auth_token from './auth.js'
 
 const issuerName = 'Kela'
 const issuerLogo = 'https://www.kela.fi/documents/20124/410402/logo-kela-rgb.png/50cdb366-b094-027e-2ac2-0439af6dc529?t=1643974848905'
@@ -51,7 +51,7 @@ function initRoles() {
         const updateOrganization = "UPDATE organizations SET did = $did WHERE id = $id;"
         const roles = {}
         db.all(selectOrganizations, [], async (err, rows) => {
-            if (err) throw err;
+            if (err) throw err
             rows.forEach((row) => {
                 roles[row.role] = row
             })

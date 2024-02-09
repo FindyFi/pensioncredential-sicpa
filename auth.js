@@ -17,6 +17,5 @@ const params = {
 const resp = await fetch(config.token_url, params)
 const json = await resp.json()
 // console.log(json)
-export const { auth_token } = {
-    auth_token: `Bearer ${json.access_token}`
-}
+export default `Bearer ${json.access_token}`
+

@@ -20,7 +20,7 @@ async function createOffer() {
   credParams.headers['X-ORGANIZATION-ID'] = roles.issuer.id
   // console.log(issueUrl, credParams)
   const resp = await fetch(issueUrl, credParams)
-  if (resp.status == 403) {
+  if (resp.status == 401) {
     // refresh auth token
     jsonHeaders.Authorization = await import('./auth.js')
     return createOffer() // recursion; possible infinite loop!

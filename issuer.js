@@ -18,7 +18,7 @@ async function createOffer() {
   }
   credParams.headers.Accept = '*/*'
   credParams.headers['X-ORGANIZATION-ID'] = roles.issuer.id
-  // console.log(issueUrl, credParams)
+  console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
   if (resp.status == 401) {
     // refresh auth token

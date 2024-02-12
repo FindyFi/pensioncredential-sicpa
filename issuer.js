@@ -22,7 +22,7 @@ async function createOffer() {
   const resp = await fetch(issueUrl, credParams)
   if (resp.status == 401) {
     // refresh auth token
-    jsonHeaders.Authorization = await import('./auth.js')
+    jsonHeaders.Authorization = await import('./auth.js').default
     return createOffer() // recursion; possible infinite loop!
   }
   const obj = await resp.json()

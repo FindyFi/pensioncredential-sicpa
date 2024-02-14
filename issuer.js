@@ -18,11 +18,18 @@ async function createOffer() {
   }
   credParams.headers.Accept = '*/*'
   credParams.headers['X-ORGANIZATION-ID'] = roles.issuer.id
-  console.log(issueUrl, JSON.stringify(credParams, null, 1))
+  // console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
+  console.log(resp.status, issueUrl)
   if (resp.status == 401) {
     // refresh auth token
-    jsonHeaders.Authorization = await import('./auth.js').default
+    const auth_token = await import('./auth.js')
+    if (!auth_token.default) {
+      console.log(auth_token)
+      throw new Error('Auth token refresh failed!')
+    }
+    jsonHeaders.Authorization = auth_token.default
+    console.log(`refreshed auth token: ${jsonHeaders.Authorization}`)
     return createOffer() // recursion; possible infinite loop!
   }
   const obj = await resp.json()
@@ -32,7 +39,7 @@ async function createOffer() {
   }
   // console.log(resp.status, offerUri)
   const credentialOffer = `openid-credential-offer://?credential_offer_uri=${encodeURIComponent(offerUri)}`
-  console.log(credentialOffer)
+  // console.log(credentialOffer)
   return credentialOffer  
 }
 

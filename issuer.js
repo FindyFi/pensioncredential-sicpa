@@ -23,12 +23,12 @@ async function createOffer() {
   console.log(resp.status, issueUrl)
   if (resp.status == 401) {
     // refresh auth token
-    const auth_token = await import('./auth.js')
-    if (!auth_token.default) {
-      console.log(auth_token)
+    const auth = await import('./auth.js').default
+    const auth_token = await auth()
+    if (!auth_token) {
       throw new Error('Auth token refresh failed!')
     }
-    jsonHeaders.Authorization = auth_token.default
+    jsonHeaders.Authorization = auth_token
     console.log(`refreshed auth token: ${jsonHeaders.Authorization}`)
     return createOffer() // recursion; possible infinite loop!
   }

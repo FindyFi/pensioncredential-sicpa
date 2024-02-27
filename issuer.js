@@ -1,5 +1,6 @@
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
+import auth from './auth.js'
 import {config, jsonHeaders, roles} from './init.js'
 import credential from './pensioncredential.json' assert {'type': 'json'}
 
@@ -23,7 +24,6 @@ async function createOffer() {
   console.log(resp.status, issueUrl)
   if (resp.status == 401) {
     // refresh auth token
-    const auth = await import('./auth.js').default
     const auth_token = await auth()
     if (!auth_token) {
       throw new Error('Auth token refresh failed!')

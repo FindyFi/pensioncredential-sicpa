@@ -1,6 +1,8 @@
 import sqlite3 from 'sqlite3'
-import config from './config.json' assert {'type': 'json'}
+import config from './config.json' with {type: 'json'}
 import auth from './auth.js'
+
+const credentialName = 'pensionCredential'
 
 const issuerName = 'Kela'
 const issuerLogo = 'https://www.kela.fi/documents/20124/410402/logo-kela-rgb.png/50cdb366-b094-027e-2ac2-0439af6dc529?t=1643974848905'
@@ -23,7 +25,10 @@ const jsonHeaders = {
 
 const db = await openDB()
 const roles = await initRoles()
-export { config, db, jsonHeaders, roles }
+const profileId = await initProfiles()
+const templateId = await initTemplates()
+// console.log( { config, db, jsonHeaders, roles, profileId, templateId })
+export { config, db, jsonHeaders, roles, profileId, templateId }
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -31,10 +36,12 @@ function openDB() {
             if (err) reject(err.message)
             // console.log(`Connected to the database '${config.db_file}'.`)
             const create = `CREATE TABLE IF NOT EXISTS organizations (
-                id INTEGER PRIMARY KEY,
+                id char(36) PRIMARY KEY,
+                publicId char(36),
                 name varchar(50),
-                clientId INTEGER,
+                keyId char(36),
                 did VARCHAR(500),
+                identityId char(36),
                 role varchar(20)
             );`
             db.run(create, (err) => {
@@ -47,9 +54,9 @@ function openDB() {
 
 function initRoles() {
     return new Promise((resolve, reject) => {
-        const insertOrganization = db.prepare("REPLACE INTO organizations (id, name, clientId, did, role) VALUES (?, ?, ?, ?, ?);")
-        const selectOrganizations = "SELECT id, name, clientId, did, role FROM organizations;"
-        const updateOrganization = "UPDATE organizations SET did = $did WHERE id = $id;"
+        const insertOrganization = db.prepare("REPLACE INTO organizations (id, publicId, name, did, role) VALUES (?, ?, ?, ?, ?);")
+        const selectOrganizations = "SELECT id, publicId, name, keyId, did, identityId, role FROM organizations;"
+        const updateOrganization = "UPDATE organizations SET keyId = $keyID, did = $did, identityId = $identityId WHERE id = $id;"
         const roles = {}
         db.all(selectOrganizations, [], async (err, rows) => {
             if (err) throw err
@@ -60,7 +67,9 @@ function initRoles() {
                 resolve(roles)
                 return
             }
-            const createOrganizationUrl = `${config.credentials_api}/organizations`
+            const createOrganizationUrl = `${config.credentials_api}/agents`
+            const generateKeyUrl = `${config.credentials_api}/kms/providers/local/generate-key`
+            const createDIDUrl = `${config.credentials_api}/identity/dids`
             for (let role of ['issuer', 'verifier']) {
                 if (!roles[role]) {
                     const orgParams = {
@@ -71,35 +80,140 @@ function initRoles() {
                             "imageUrl": role == 'issuer' ? issuerLogo : verifierLogo,
                         })
                     }
-                    // console.log(createOrganizationUrl, orgParams)
                     const resp = await fetch(createOrganizationUrl, orgParams)
                     const org = await resp.json()
+                    // console.log(resp.status, createOrganizationUrl, orgParams, org)
+                    // console.log(org)
                     org.role = role
-                    insertOrganization.run(org.id, org.clientId, org.name, "", role)
+                    insertOrganization.run(org.id, org.publicId, org.name, "", role)
                     roles[role] = org
                 }
                 if (!roles[role].did) {
-                    const createDIDUrl = `${config.credentials_api}/organizations/${roles[role].id}/issuance-dids`
-                    const didParams = {
+                    const keyParams = {
                         method: 'POST',
                         headers: jsonHeaders,
                         body: JSON.stringify({
                             "keyType": "ed25519",
+                        })
+                    }
+                    keyParams.headers['X-AGENT-ID'] = roles[role].id
+                    const keyResp = await fetch(generateKeyUrl, keyParams)
+                    const keyJson = await keyResp.json()
+                    // console.log(keyResp.status, generateKeyUrl, keyParams, keyJson)
+                    roles[role].keyId = keyJson.keyId
+                    // console.log(roles[role])
+                    const didParams = {
+                        method: 'POST',
+                        headers: jsonHeaders,
+                        body: JSON.stringify({
+                            "keys": [roles[role].keyId],
                             "method": "web"
                         })
                     }
-                    // console.log(createDIDUrl, orgParams)
-                    const resp = await fetch(createDIDUrl, didParams)
-                    const json = await resp.json()
-                    roles[role].did = json.did
+                    const didResp = await fetch(createDIDUrl, didParams)
+                    const didJson = await didResp.json()
+                    // console.log(didResp.status, createDIDUrl, didParams, didJson)
+                    roles[role].identityId = didJson.id
+                    roles[role].did = didJson.did
                     // console.log(json)
-                    db.run(updateOrganization, [roles[role].did, roles[role].id])
+                    db.run(updateOrganization, [roles[role].keyId, roles[role].did, roles[role].identityId, roles[role].id])
                 }
             }
             resolve(roles)
         })
     })
 }
-        
 
+async function initProfiles() {
+    // see https://docs.dip.sicpa.com/getting-started/Tutorials/profiles/#joining-a-profile-with-sd-jwt-capabilities for profile IDs
+    const profileId = '018fcec1-54eb-76dd-adc2-41aa343e1ed3'
+    const joinInteropProfileUrl = `${config.credentials_api}/interoperability/profiles/${profileId}/instances`
+    const params = {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify(  {
+            "identities": [
+                roles.issuer.identityId
+            ],
+            "keys": [
+                roles.issuer.keyId
+            ]
+          })
+    }
+    params.headers['X-AGENT-ID'] = roles.issuer.id
+    const resp = await fetch(joinInteropProfileUrl, params)
+    const profile = await resp.json()
+    // console.log(resp.status, joinInteropProfileUrl, params, profile)
+    return profile.id
+}
+
+async function initTemplates() {
+    const templateUrl = `${config.credentials_api}/templates`
+    const getParams = {
+        headers: {
+            'Authorization': auth_token,
+            'Accept': 'application/json',
+            'X-AGENT-ID': roles.issuer.id
+        }
+    }
+    const getResp = await fetch(templateUrl, getParams)
+    const list = await getResp.json()
+    for (const template of list) {
+        if (template.templateName == credentialName) {
+            return template.templateId
+        }
+    }
+    const params = {
+        method: 'POST',
+        headers: jsonHeaders,
+        body: JSON.stringify({
+            templateName: credentialName,
+            credentialFormats: [
+                "SD_JWT_VC"
+            ],
+            revocable: false,
+            claimsJsonSchema: {
+                type: "object",
+                properties: {
+                    Pension: {
+                        type: "object",
+                        properties: {
+                            typeCode: "string",
+                            typeName: "string",
+                            startDate: "date",
+                            endDate: "date",
+                            status: "integer"
+                       }
+                    },
+                    Person: {
+                        type: "object",
+                        properties: {
+                            birthDate: "date",
+                            givenName: "string",
+                            familyName: "string"
+                       },
+                    },
+                    IdentityObject: {
+                        type: "object",
+                        properties: {
+                            hashed: "boolean",
+                            identityHash: "string",
+                            identityType: "string",
+                            salt: "string"
+                        }
+                    }
+                },
+                required: ["Person", "Pension", "IdentityObject"],
+                selectiveDisclosures: ["Pension", "Person"],
+                additionalProperties: false
+            },
+            interopProfileInstance: profileId
+        })
+    }
+    params.headers['X-AGENT-ID'] = roles.issuer.id
+    const resp = await fetch(templateUrl, params)
+    const template = await resp.json()
+    console.log(resp.status, templateUrl, params, template)
+    return template.templateId
+}
 

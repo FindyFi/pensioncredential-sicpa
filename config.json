@@ -1,8 +1,9 @@
 {
+    "client_name": "<Your SICPA API client name>",
     "client_id": "<Your SICPA API client id>",
     "client_secret": "<Your SICPA API client secret>",
-    "credentials_api": "https://api.sandbox.dip.sicpa.com/credentials-api",
-    "token_url": "https://signin.sandbox.dip.sicpa.com/oauth2/token",
+    "credentials_api": "https://api.pre.vc-dts.sicpa.com",
+    "token_url": "https://signin.pre.vc-dts.sicpa.com/oauth2/token",
     "ns_prefix": "https://pensiondemo.findy.fi",
     "db_file": "database.sqlite",
     "server_host": "localhost",

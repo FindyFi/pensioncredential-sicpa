@@ -1,10 +1,10 @@
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import auth from './auth.js'
-import {config, jsonHeaders, roles} from './init.js'
-import credential from './pensioncredential.json' assert {'type': 'json'}
+import {config, jsonHeaders, roles, templateId} from './init.js'
+import credential from './pensioncredential.json' with {type: 'json'}
 
-const issueUrl = `${config.credentials_api}/openid4vc/credential_offer`
+const issueUrl = `${config.credentials_api}/openid4vc/credential-offer`
 
 async function createOffer() {
   credential.issuer = roles.issuer.did
@@ -13,13 +13,14 @@ async function createOffer() {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify({
-      "credential": credential,
-      "issuerDid": roles.issuer.did,
+      claims: credential.credentialSubject,
+      credentialFormat: "SD-JWT-VC",
+      templateId: templateId
     })
   }
   credParams.headers.Accept = '*/*'
-  credParams.headers['X-ORGANIZATION-ID'] = roles.issuer.id
-  // console.log(issueUrl, JSON.stringify(credParams, null, 1))
+  credParams.headers['X-AGENT-ID'] = roles.issuer.id
+  console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
   console.log(resp.status, issueUrl)
   if (resp.status == 401) {

@@ -1,4 +1,4 @@
-import config from './config.json' assert {'type': 'json'}
+import config from './config.json' with {type: 'json'}
 
 const params = {
     method: 'POST',
@@ -18,7 +18,8 @@ export default async function auth() {
     const resp = await fetch(config.token_url, params)
     if (resp.status != 200) {
         console.error(resp.status, config.token_url)
-        console.log(JSON.stringify(params, null, 1))
+        // console.log(JSON.stringify(params, null, 1))
+        console.log(params)
     }
     const json = await resp.json()
     // console.log(JSON.stringify(json, null, 1))

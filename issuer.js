@@ -59,7 +59,7 @@ const sendOffer = async function (req, res) {
       console.error(e)
       res.writeHead(404)
       res.end(`${path} not found!`)
-      return false  
+      return false
     }
   }
   else if (path !== '/') {

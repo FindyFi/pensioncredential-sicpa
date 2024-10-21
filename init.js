@@ -70,6 +70,7 @@ function initRoles() {
             const createOrganizationUrl = `${config.credentials_api}/agents`
             const generateKeyUrl = `${config.credentials_api}/kms/providers/local/generate-key`
             const createDIDUrl = `${config.credentials_api}/identity/dids`
+            const createWebhookUrl = `${config.credentials_api}/webhooks`
             for (let role of ['issuer', 'verifier']) {
                 if (!roles[role]) {
                     const orgParams = {
@@ -117,6 +118,23 @@ function initRoles() {
                     roles[role].did = didJson.did
                     // console.log(json)
                     db.run(updateOrganization, [roles[role].keyId, roles[role].did, roles[role].identityId, roles[role].id])
+                }
+                if (role == 'verifier') {
+                    // create webhook to listen
+                    const whParams = {
+                        method: 'POST',
+                        headers: jsonHeaders,
+                        body: JSON.stringify({
+                            url: config.verifier_public_url + config.verifier_webhook_path,
+                            name: "Findynet SICPA verifier",
+                            active: true,
+                            webhookTypes: ["verification"],
+                            destinationAuthentication: null
+                        })
+                    }
+                    const whResp = await fetch(createWebhookUrl, whParams)
+                    const whJson = await whResp.json()
+                    // console.log(whResp.status, createWebhookUrl, whParams, whJson)
                 }
             }
             resolve(roles)

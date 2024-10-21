@@ -405,6 +405,13 @@ const handleRequests = async function (req, res) {
       res.writeHead(200)
       res.end(config.verifier_entity_configuration)
       return false
+    case config.verifier_webhook_path:
+      console.log(req.params)
+      console.log(req.body)
+      res.setHeader("Content-Type", "text/plain")
+      res.writeHead(200)
+      res.end(req.body)
+      return false
     case '/error':
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(500)

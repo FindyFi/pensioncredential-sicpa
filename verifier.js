@@ -89,7 +89,17 @@ async function createRequest(id) {
   // console.log(JSON.stringify(requestBody, null, 1))
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
-  if (resp.status != 200) {
+  if (resp.status == 401) {
+    // refresh auth token
+    const auth_token = await auth()
+    if (!auth_token) {
+      throw new Error('Auth token refresh failed!')
+    }
+    jsonHeaders.Authorization = auth_token
+    console.log(`refreshed auth token: ${jsonHeaders.Authorization}`)
+    createRequest(id) // recursion; possible infinite loop!
+  }
+  else if (resp.status != 200) {
     console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
   }
   // console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
@@ -366,7 +376,17 @@ async function getStatus(id) {
   const statusUrl = `${config.credentials_api}/openid4vc/verification/${states[id]}`
   const resp = await fetch(statusUrl, { headers: jsonHeaders })
   // console.log(statusUrl, resp.status)
-  if (resp.status != 200) {
+  if (resp.status == 401) {
+    // refresh auth token
+    const auth_token = await auth()
+    if (!auth_token) {
+      throw new Error('Auth token refresh failed!')
+    }
+    jsonHeaders.Authorization = auth_token
+    console.log(`refreshed auth token: ${jsonHeaders.Authorization}`)
+    return getStatus(id) // recursion; possible infinite loop!
+  }
+  else if (resp.status != 200) {
     console.error(JSON.stringify(await resp.text(), null, 1))
     return false
   }

@@ -145,6 +145,21 @@ function initRoles() {
 async function initProfiles() {
     // see https://docs.dip.sicpa.com/getting-started/Tutorials/profiles/#joining-a-profile-with-sd-jwt-capabilities for profile IDs
     const profileId = '018fcec1-54eb-76dd-adc2-41aa343e1ed3'
+    const getInteropProfilesUrl = `${config.credentials_api}/interoperability/profiles/${profileId}/instances`
+    const getParams = {
+        method: 'GET',
+        headers: {
+            'Authorization': auth_token,
+            'Accept': 'application/json',
+            'X-AGENT-ID': roles.issuer.id
+        }
+    }
+    const getResp = await fetch(getInteropProfilesUrl, getParams)
+    const instances = await getResp.json()
+    if (instances && instances[0]) {
+        return instances[0].id
+
+    }
     const joinInteropProfileUrl = `${config.credentials_api}/interoperability/profiles/${profileId}/instances`
     const params = {
         method: 'POST',
@@ -160,9 +175,9 @@ async function initProfiles() {
     }
     params.headers['X-AGENT-ID'] = roles.issuer.id
     const resp = await fetch(joinInteropProfileUrl, params)
-    const profile = await resp.json()
-    // console.log(resp.status, joinInteropProfileUrl, params, profile)
-    return profile.id
+    const profileInstance = await resp.json()
+    // console.log(resp.status, joinInteropProfileUrl, params, profileInstance)
+    return profileInstance.id
 }
 
 async function initTemplates() {

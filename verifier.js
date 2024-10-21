@@ -334,11 +334,11 @@ function renderCredential(sdjwt) {
 
 async function showSuccess(obj, res) {
   console.log(JSON.stringify(obj, null, 2))
+  let html
 /*
   const status = obj
   const presentationPolicies = status.policyResults?.results?.at(0)?.policies
   const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
-  let html
   if (sdjwt) {
     html = `<h2>Tiedot:</h2>\n${renderCredential(sdjwt)}`
   }

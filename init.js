@@ -138,7 +138,7 @@ async function initProfiles() {
             "keys": [
                 roles.issuer.keyId
             ]
-          })
+        })
     }
     params.headers['X-AGENT-ID'] = roles.issuer.id
     const resp = await fetch(joinInteropProfileUrl, params)
@@ -161,6 +161,19 @@ async function initTemplates() {
     for (const template of list) {
         if (template.templateName == credentialName) {
             return template.templateId
+/*
+            const deleteUrl = `${config.credentials_api}/templates/${template.templateId}`
+            const params = {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': auth_token,
+                    'Accept': 'application/json',
+                    'X-AGENT-ID': roles.issuer.id
+                }
+            }
+            const resp = await fetch(deleteUrl, params)
+            console.log(resp.status, template.templateId)
+*/
         }
     }
     const params = {
@@ -182,28 +195,20 @@ async function initTemplates() {
                             typeName: "string",
                             startDate: "date",
                             endDate: "date",
-                            status: "integer"
+                            provisional: "boolean"
                        }
                     },
                     Person: {
                         type: "object",
                         properties: {
-                            birthDate: "date",
-                            givenName: "string",
-                            familyName: "string"
+                            birth_date: "date",
+                            given_dame: "string",
+                            family_name: "string",
+                            personal_administrative_number: "string"
                        },
-                    },
-                    IdentityObject: {
-                        type: "object",
-                        properties: {
-                            hashed: "boolean",
-                            identityHash: "string",
-                            identityType: "string",
-                            salt: "string"
-                        }
                     }
                 },
-                required: ["Person", "Pension", "IdentityObject"],
+                required: ["Pension", "Person"],
                 selectiveDisclosures: ["Pension", "Person"],
                 additionalProperties: false
             },
@@ -213,7 +218,7 @@ async function initTemplates() {
     params.headers['X-AGENT-ID'] = roles.issuer.id
     const resp = await fetch(templateUrl, params)
     const template = await resp.json()
-    console.log(resp.status, templateUrl, params, template)
+    // console.log(resp.status, templateUrl, params, template)
     return template.templateId
 }
 

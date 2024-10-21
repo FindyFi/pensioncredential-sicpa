@@ -182,7 +182,7 @@ async function initTemplates() {
         body: JSON.stringify({
             templateName: credentialName,
             credentialFormats: [
-                "SD_JWT_VC"
+                "SD-JWT-VC"
             ],
             revocable: false,
             claimsJsonSchema: {

@@ -380,6 +380,11 @@ const handleRequests = async function (req, res) {
   let id = fullUrl.searchParams.get('id')
   console.log(fullUrl.pathname, id)
   switch (fullUrl.pathname) {
+    case '/.well-known/openid-federation':
+      res.setHeader("Content-Type", "application/entity-statement+jwt")
+      res.writeHead(200)
+      res.end(config.verifier_entity_configuration)
+      return false
     case '/error':
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(500)

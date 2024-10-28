@@ -48,7 +48,7 @@ async function createRequest(id) {
           "fields": [
             {
               "path": [
-                "Person.given_name",
+                "$.credentialSubject.Person.given_name",
               ]
             },
 /*

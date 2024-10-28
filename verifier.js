@@ -1,6 +1,7 @@
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
+import auth from './auth.js'
 import { jsonHeaders, roles, config } from './init.js'
 
 const states = {}
@@ -308,7 +309,7 @@ async function showRequest(res) {
       c.appendChild(t)
     }
    }
-   timer = setInterval(checkStatus, ${pollingInterval * 1000} )
+   // timer = setInterval(checkStatus, ${pollingInterval * 1000} )
 
    </script>
  </body>

@@ -16,17 +16,60 @@ async function createRequest(id) {
     ],
     "presentationDefinition": {
       "id": uuidv4(),
+/*
       "name": "Eläketodiste",
+*/
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
       "format": {
         "jwt_vc_json": {
           "alg": [
-            "EdDSA"
+            "RS256",
+            "RS384",
+            "RS512",
+            "PS256",
+            "PS384",
+            "PS512",
+            "ES256",
+            "ES256K",
+            "ES384",
+            "ES512",
+            "EdDSA",
+            "Ed25519",
+            "Ed448"
           ]
         },
         "jwt_vp_json": {
           "alg": [
-            "EdDSA"
+            "RS256",
+            "RS384",
+            "RS512",
+            "PS256",
+            "PS384",
+            "PS512",
+            "ES256",
+            "ES256K",
+            "ES384",
+            "ES512",
+            "EdDSA",
+            "Ed25519",
+            "Ed448"
+          ]
+        },
+        "jwt_vp_json": {
+          "alg": [
+            "RS256",
+            "RS384",
+            "RS512",
+            "PS256",
+            "PS384",
+            "PS512",
+            "ES256",
+            "ES256K",
+            "ES384",
+            "ES512",
+            "EdDSA",
+            "Ed25519",
+            "Ed448"
           ]
         },
       },
@@ -38,6 +81,12 @@ async function createRequest(id) {
               "path": [
                 "Person.personal_administrative_number",
               ]
+            },
+            {
+              "path": [
+                "Pension.endDate",
+              ],
+              "optional": true
             },
             {
               "path": [
@@ -87,7 +136,7 @@ async function createRequest(id) {
   // console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
   const credentialRequest = await resp.json()
   states[id] = credentialRequest.referenceId
-  console.log(resp.status, credentialRequest, id)
+  // console.log(resp.status, credentialRequest, id)
   return credentialRequest
 }
 

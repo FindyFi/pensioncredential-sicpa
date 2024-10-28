@@ -16,58 +16,44 @@ async function createRequest(id) {
     ],
     "presentationDefinition": {
       "id": uuidv4(),
-/*
       "name": "Eläketodiste",
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
       "format": {
-        "ldp_vp": {
-          "proof_type": [
-            "Ed25519Signature2018"
-          ]
-        },
-        "ldp_vc": {
-          "proof_type": [
-            "Ed25519Signature2018"
-          ]
-        },
         "jwt_vc_json": {
           "alg": [
-            "RSA256"
+            "EdDSA"
           ]
         },
         "jwt_vp_json": {
           "alg": [
-            "RSA256"
+            "EdDSA"
           ]
-        }
+        },
+        "SD-JWT-VC": {
+          "alg": [
+            "EdDSA"
+          ]
+        },
       },
-*/
       "input_descriptors": [{
         "id": "Kela-HSL",
         "constraints": {
           "fields": [
             {
               "path": [
-                "$.credentialSubject.Person.given_name",
-              ]
-            },
-/*
-            {
-              "path": [
-                "$.credentialSubject.Person.familyName",
+                "$.credentialSubject.Person.personal_administrative_number",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Person.birthDate",
+                "$.credentialSubject.Pension.startDate",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Pension.statusCode",
+                "$.credentialSubject.Pension.typeCode",
               ]
             },
-*/
           ],
           // "limit_disclosure": "required"
         }

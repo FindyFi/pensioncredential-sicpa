@@ -29,11 +29,6 @@ async function createRequest(id) {
             "EdDSA"
           ]
         },
-        "SD-JWT-VC": {
-          "alg": [
-            "EdDSA"
-          ]
-        },
       },
       "input_descriptors": [{
         "id": "Kela-HSL",
@@ -41,17 +36,17 @@ async function createRequest(id) {
           "fields": [
             {
               "path": [
-                "$.credentialSubject.Person.personal_administrative_number",
+                "Person.personal_administrative_number",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Pension.startDate",
+                "Pension.startDate",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Pension.typeCode",
+                "Pension.typeCode",
               ]
             },
           ],
@@ -92,7 +87,7 @@ async function createRequest(id) {
   // console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
   const credentialRequest = await resp.json()
   states[id] = credentialRequest.referenceId
-  // console.log(resp.status, credentialRequest, id)
+  console.log(resp.status, credentialRequest, id)
   return credentialRequest
 }
 

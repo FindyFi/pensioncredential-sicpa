@@ -116,7 +116,15 @@ function initRoles() {
                     // console.log(didResp.status, createDIDUrl, didParams, didJson)
                     roles[role].identityId = didJson.id
                     roles[role].did = didJson.did
-                    // console.log(json)
+                    const anchorUrl = `${createDIDUrl}/${didJson.id}/anchoring`
+                    const anchorParams = {
+                        method: 'POST',
+                        headers: jsonHeaders,
+                    }
+                    anchorParams.headers['X-AGENT-ID'] = roles[role].id
+                    const anchorResp = await fetch(anchorUrl, anchorParams)
+                    const anchorJson = await anchorResp.json()
+                    console.log(`Anchored DID ${anchorJson.did}`)
                     db.run(updateOrganization, [roles[role].keyId, roles[role].did, roles[role].identityId, roles[role].id])
                 }
                 if (role == 'verifier') {

@@ -79,23 +79,23 @@ async function createRequest(id) {
           "fields": [
             {
               "path": [
-                "$..Person.personal_administrative_number",
+                "$.Person.personal_administrative_number",
               ]
             },
             {
               "path": [
-                "$..Pension.endDate",
+                "$.Pension.endDate",
               ],
               "optional": true
             },
             {
               "path": [
-                "$..Pension.startDate",
+                "$.Pension.startDate",
               ]
             },
             {
               "path": [
-                "$..Pension.typeCode",
+                "$.Pension.typeCode",
               ]
             },
           ],

@@ -80,22 +80,19 @@ async function createRequest(id) {
             {
               "path": [
                 "$.Person.personal_administrative_number",
+                "$..Person.personal_administrative_number",
               ]
             },
             {
               "path": [
-                "$.Pension.endDate",
-              ],
-              "optional": true
-            },
-            {
-              "path": [
                 "$.Pension.startDate",
+                "$..Pension.startDate",
               ]
             },
             {
               "path": [
                 "$.Pension.typeCode",
+                "$..Pension.typeCode",
               ]
             },
           ],

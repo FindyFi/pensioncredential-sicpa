@@ -406,9 +406,6 @@ const handleRequests = async function (req, res) {
   const fullUrl = new URL(config.verifier_public_url + req.url)
   let id = fullUrl.searchParams.get('id')
   console.log(fullUrl.pathname, id)
-  console.log(req.query)
-  console.log(req.params)
-  console.log(req.body)
   switch (fullUrl.pathname) {
     case '/.well-known/openid-federation':
       res.setHeader("Content-Type", "application/entity-statement+jwt")
@@ -422,7 +419,7 @@ const handleRequests = async function (req, res) {
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(200)
       // res.end(req.body)
-      res.json({received: ok})
+      res.json("ok")
       return false
     case '/error':
       res.setHeader("Content-Type", "text/plain")

@@ -419,7 +419,7 @@ const handleRequests = async function (req, res) {
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(200)
       // res.end(req.body)
-      res.json("ok")
+      res.end("ok")
       return false
     case '/error':
       res.setHeader("Content-Type", "text/plain")

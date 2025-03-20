@@ -376,43 +376,6 @@ function renderCredential(sdjwt) {
   return html
 }
 
-async function showSuccess(obj, res) {
-  console.log(JSON.stringify(obj, null, 2))
-  let html
-/*
-  const status = obj
-  const presentationPolicies = status.policyResults?.results?.at(0)?.policies
-  const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
-  if (sdjwt) {
-    html = `<h2>Tiedot:</h2>\n${renderCredential(sdjwt)}`
-  }
-  else {
-    html = `<h2>VIRHE:</h2>\n<pre>${JSON.stringify(status, null, 1)}</pre>`
-  }
-*/
-  console.log(obj)
-  res.setHeader("Content-Type", "text/html")
-  res.writeHead(200)
-  res.end(`<!DOCTYPE html>
-<html>
- <meta charset="UTF-8">
- <style>
-  table {
-   max-width: 30em;
-   margin: 1em auto;
-  }
-  pre, th, td {
-   text-align: left;
-  }
- </style>
- <body style="text-align: center;">
-  <h1>Tiedot tulivat perille!</h1>
-  <p>Todisteen tarkistuksen tila: <strong>${obj?.event?.state}</strong></p>
-${html}
- </body>
-</html>`)
-}
-
 async function getStatus(id) {
   if (!states[id]) {
     return false
@@ -443,6 +406,9 @@ const handleRequests = async function (req, res) {
   const fullUrl = new URL(config.verifier_public_url + req.url)
   let id = fullUrl.searchParams.get('id')
   console.log(fullUrl.pathname, id)
+  console.log(req.query)
+  console.log(req.params)
+  console.log(req.body)
   switch (fullUrl.pathname) {
     case '/.well-known/openid-federation':
       res.setHeader("Content-Type", "application/entity-statement+jwt")
@@ -450,19 +416,18 @@ const handleRequests = async function (req, res) {
       res.end(config.verifier_entity_configuration)
       return false
     case config.verifier_webhook_path:
+      console.log(fullUrl)
       console.log(req.params)
       console.log(req.body)
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(200)
-      res.end(req.body)
+      // res.end(req.body)
+      res.json({received: ok})
       return false
     case '/error':
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(500)
       res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
-      return false
-    case config.verifier_webhook_path:
-      await showSuccess(req.body, res)
       return false
     case '/status':
       const status = await getStatus(id)

@@ -2,7 +2,7 @@ import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
 import auth from './auth.js'
-import { jsonHeaders, roles, config } from './init.js'
+import { jsonHeaders, roles, config, credentialName } from './init.js'
 
 const states = {}
 const pollingInterval = 3 // seconds
@@ -21,6 +21,10 @@ async function createRequest(id) {
 */
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
       "format": {
+        "vc+sd-jwt": {
+          "sd-jwt_alg_values": ["ES256"],
+          "kb-jwt_alg_values": ["ES256"],
+        },
         "jwt_vc_json": {
           "alg": [
             "RS256",
@@ -77,6 +81,17 @@ async function createRequest(id) {
         "id": "Kela-HSL",
         "constraints": {
           "fields": [
+/*
+            {
+              "path": ["$.vc.type"],
+              "filter": {
+                "type": "array",
+                "contains": {
+                  "const": credentialName
+                }
+              }
+            },
+*/
             {
               "path": [
                 "$.Person.personal_administrative_number",
@@ -127,8 +142,9 @@ async function createRequest(id) {
     console.log(`refreshed auth token: ${jsonHeaders.Authorization}`)
     createRequest(id) // recursion; possible infinite loop!
   }
-  else if (resp.status != 200) {
-    console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
+  else if (!resp.ok) {
+    console.error(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
+    console.log(await resp.json())
   }
   // console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
   const credentialRequest = await resp.json()
@@ -336,7 +352,7 @@ async function showRequest(res) {
       c.appendChild(t)
     }
    }
-   // timer = setInterval(checkStatus, ${pollingInterval * 1000} )
+   timer = setInterval(checkStatus, ${pollingInterval * 3000} )
 
    </script>
  </body>

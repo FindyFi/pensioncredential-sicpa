@@ -413,9 +413,17 @@ const handleRequests = async function (req, res) {
       res.end(config.verifier_entity_configuration)
       return false
     case config.verifier_webhook_path:
-      console.log(fullUrl)
-      console.log(req.params)
-      console.log(req.body)
+      let body = []
+      req.on('error', err => {
+        console.error(err)
+      })
+      .on('data', chunk => {
+        body.push(chunk)
+      })
+      .on('end', () => {
+        body = Buffer.concat(body).toString()
+      })
+      console.log(body)
       res.setHeader("Content-Type", "text/plain")
       res.writeHead(200)
       // res.end(req.body)

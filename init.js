@@ -28,7 +28,7 @@ const roles = await initRoles()
 const profileId = await initProfiles()
 const templateId = await initTemplates()
 // console.log( { config, db, jsonHeaders, roles, profileId, templateId })
-export { config, db, jsonHeaders, roles, profileId, templateId }
+export { config, db, jsonHeaders, roles, profileId, templateId, credentialName }
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -151,7 +151,7 @@ function initRoles() {
 }
 
 async function initProfiles() {
-    // see https://docs.dip.sicpa.com/getting-started/Tutorials/profiles/#joining-a-profile-with-sd-jwt-capabilities for profile IDs
+    // see https://docs.dip.sicpa.com/tutorials/profiles/#joining-a-profile-with-sd-jwt-capabilities for profile IDs
     const profileId = '018fcec1-54eb-76dd-adc2-41aa343e1ed3'
     const getInteropProfilesUrl = `${config.credentials_api}/interoperability/profiles/${profileId}/instances`
     const getParams = {
@@ -253,6 +253,30 @@ async function initTemplates() {
                 selectiveDisclosures: ["Pension", "Person"],
                 additionalProperties: false
             },
+            "credentialDisplayValues": [
+                {
+                    "name": "Eläketodiste",
+                    "description": "Todiste Kelan maksamasta kansaneläkkeestä",
+                    "locale": "fi-FI",
+                    "logo": {
+                        "uri": issuerLogo,
+                        "alt_text": issuerName
+                    },
+                    "background_color": "#003580",
+                    "text_color": "#FFFFFF"
+                },
+                {
+                    "name": "Pensioner's credential",
+                    "description": "Proof that you get state pension paid by Kela",
+                    "locale": "en-EN",
+                    "logo": {
+                        "uri": issuerLogo,
+                        "alt_text": issuerName
+                    },
+                    "background_color": "#003580",
+                    "text_color": "#FFFFFF"
+                }
+              ],
             interopProfileInstance: profileId
         })
     }

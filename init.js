@@ -136,8 +136,7 @@ function initRoles() {
                             url: config.verifier_public_url + config.verifier_webhook_path,
                             name: "Findynet SICPA verifier",
                             active: true,
-                            webhookTypes: ["verification"],
-                            destinationAuthentication: null
+                            webhookTypes: ["verification"]
                         })
                     }
                     const whResp = await fetch(createWebhookUrl, whParams)

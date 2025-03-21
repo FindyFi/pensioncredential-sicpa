@@ -268,7 +268,7 @@ async function showRequest(res) {
    const defaultLanguage = currentLanguage
    const translatedElementsSelector = '[lang]'
    const switcher = document.createElement('ul')
-   const css = document.styleSheets[0];
+   const css = document.styleSheets[0]
    switcher.className = 'language-switcher'
    languages.forEach((lang) => {
     const li = document.createElement('li')
@@ -311,29 +311,27 @@ async function showRequest(res) {
    let timer
    async function checkStatus() {
     const resp = await fetch(uri)
-    if (status.verificationResult) {
+    if (!resp.ok) {
+      console.error(await resp.json())
+      return false
+    }
+    const status = await resp.json()
+    if (status.status == 'FAILED') {
       clearInterval(timer)
-      // console.log(JSON.stringify(status, null, 1))
-      const presentationPolicies = status.policyResults?.results?.at(0)?.policies
-      const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
-      // console.log(sdjwt)
-      const disclosures = sdjwt.split('~')
-      disclosures.splice(0, 1) // discard jwt
-      // console.log(disclosures)
-      const attributes = {}
-      for (const d of disclosures) {
-        const decoded = JSON.parse(atob(d))
-        // console.log(decoded[1], decoded[2])
-        attributes[decoded[1]] = decoded[2]
-      }
-      // console.log(attributes)
-      const credentialPolicies = status.policyResults?.results?.at(1)?.policies
-      const credential = credentialPolicies?.at(0)?.result?.credentialSubject
-      const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
+      console.error(status)
+      c.innerHTML = \`<p>Todisteen tarkistus epäonnistui</p>\`
+      return false
+    }
+    if (status.status == 'PASSED') {
+      clearInterval(timer)
+      c.innerHTML = \`<p>Todisteen tarkistus onnistui</p>\`
+      console.log(JSON.stringify(status, null, 2))
+      if (status.claims) {
+      const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.status}</strong></p>
       <table>
-      <tr><th>Hetu</th><td>\${attributes?.person_identifier_code}</td></tr>
-      <tr><th>Eläke</th><td>\${attributes?.Pension?.typeCode}</td></tr>
-      <tr><th>Alkamispäivä</th><td>\${attributes?.Pension?.startDate}</td></tr>
+      <tr><th>Hetu</th><td>\${status.claims?.Person_identifier_code}</td></tr>
+      <tr><th>Eläke</th><td>\${status.claims?.Pension?.typeCode}</td></tr>
+      <tr><th>Alkamispäivä</th><td>\${status.claims?.Pension?.startDate}</td></tr>
       </table>
       <pre>\${JSON.stringify(status, null, 2)}</pre>\`
       c.innerHTML = html
